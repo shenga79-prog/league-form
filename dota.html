@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Регистрация турнир Puc Game Club (CS 2)</title>
+    <!-- Подключаем скрипт Telegram -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            /* Используем цвета из темы Telegram */
+            --bg-color: var(--tg-theme-bg-color, #1c1c1e);
+            --text-color: var(--tg-theme-text-color, #ffffff);
+            --hint-color: var(--tg-theme-hint-color, #8e8e93);
+            --button-color: var(--tg-theme-button-color, #2ea6ff);
+            --button-text-color: var(--tg-theme-button-text-color, #ffffff);
+            --secondary-bg: var(--tg-theme-secondary-bg-color, #2c2c2e);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { font-size: 20px; margin-bottom: 5px; }
+        .header p { font-size: 14px; color: var(--hint-color); margin-top: 0; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--hint-color);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--secondary-bg);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .hint { font-size: 12px; color: var(--hint-color); margin-top: 4px; }
+
+        /* Чекбокс согласия */
+        .agree-box {
+            display: flex;
+            align-items: flex-start;
+            font-size: 12px;
+            color: var(--hint-color);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .agree-box input { margin-right: 10px; margin-top: 2px; transform: scale(1.2); }
+
+        /* Кнопка отправки */
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .submit-btn:disabled { opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Puc Game Club</h1>
+        <p>Анкета участника (CS 2)</p>
+    </div>
+
+    <!-- Форма -->
+    <div class="form-group">
+        <label>Фамилия</label>
+        <input type="text" id="surname" placeholder="Введите текст">
+    </div>
+    <div class="form-group">
+        <label>Имя</label>
+        <input type="text" id="name" placeholder="Введите текст">
+    </div>
+    <div class="form-group">
+        <label>Отчество</label>
+        <input type="text" id="patronymic" placeholder="Введите текст">
+    </div>
+    <div class="form-group">
+        <label>Никнейм</label>
+        <input type="text" id="nickname" placeholder="Введите текст">
+        <div class="hint">Пиши тот ник, под которым будешь играть в нашей лиге.</div>
+    </div>
+    <div class="form-group">
+        <label>Дата рождения</label>
+        <input type="text" id="birthdate" placeholder="дд.мм.гггг">
+    </div>
+    <div class="form-group">
+        <label>Страна проживания</label>
+        <input type="text" id="country" placeholder="Введите текст">
+    </div>
+
+    <!-- Адаптировано под CS 2 -->
+    <div class="form-group">
+        <label>ELO (Faceit / ESEA)</label>
+        <input type="text" id="elo" placeholder="Введите ваш рейтинг">
+        <div class="hint">Актуальный ELO на момент регистрации</div>
+    </div>
+    
+    <div class="form-group">
+        <label>Ссылка на Steam / Faceit</label>
+        <input type="text" id="steam_link" placeholder="Вставь ссылку на профиль">
+    </div>
+
+    <label class="agree-box">
+        <input type="checkbox" id="agree">
+        <span>Я ОЗНАКОМЛЕН С ПРАВИЛАМИ И РЕГЛАМЕНТОМ Puc Game Club И ДАЮ СОГЛАСИЕ НА ХРАНЕНИЕ, ОБРАБОТКУ, ИСПОЛЬЗОВАНИЕ ДАННЫХ.</span>
+    </label>
+
+    <button class="submit-btn" id="submit">✅ Отправить ответ</button>
+
+    <script>
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Разворачиваем на весь экран
+
+        document.getElementById('submit').addEventListener('click', () => {
+            // Проверка на заполнение обязательных полей
+            const surname = document.getElementById('surname').value;
+            const name = document.getElementById('name').value;
+            const nickname = document.getElementById('nickname').value;
+            const agree = document.getElementById('agree').checked;
+
+            if (!surname || !name || !nickname) {
+                tg.showAlert("Пожалуйста, заполните Фамилию, Имя и Никнейм!");
+                return;
+            }
+            if (!agree) {
+                tg.showAlert("Необходимо согласиться с правилами!");
+                return;
+            }
+
+            // Собираем данные из формы
+            const formData = {
+                surname: surname,
+                name: name,
+                patronymic: document.getElementById('patronymic').value,
+                nickname: nickname,
+                birth_date: document.getElementById('birthdate').value,
+                country: document.getElementById('country').value,
+                elo: document.getElementById('elo').value,
+                steam_link: document.getElementById('steam_link').value,
+                roles: [] // Оставляем пустым, так как в CS ролей нет
+            };
+
+            // Отправляем данные в Telegram
+            tg.sendData(JSON.stringify(formData));
+            
+            // Закрываем Mini App
+            tg.close();
+        });
+    </script>
+</body>
+</html>
