@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Регистрация League of Spirits</title>
+    <!-- Подключаем скрипт Telegram -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            /* Используем цвета из темы Telegram */
+            --bg-color: var(--tg-theme-bg-color, #1c1c1e);
+            --text-color: var(--tg-theme-text-color, #ffffff);
+            --hint-color: var(--tg-theme-hint-color, #8e8e93);
+            --button-color: var(--tg-theme-button-color, #2ea6ff);
+            --button-text-color: var(--tg-theme-button-text-color, #ffffff);
+            --secondary-bg: var(--tg-theme-secondary-bg-color, #2c2c2e);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { font-size: 20px; margin-bottom: 5px; }
+        .header p { font-size: 14px; color: var(--hint-color); margin-top: 0; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--hint-color);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group input[type="text"], 
+        .form-group input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--secondary-bg);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .hint { font-size: 12px; color: var(--hint-color); margin-top: 4px; }
+
+        /* Стили для свитчей (переключателей) */
+        .switch-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--secondary-bg);
+        }
+        .switch-row:last-child { border-bottom: none; }
+        .switch-row span { font-size: 16px; }
+        
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #3a3a3c;
+            transition: .4s;
+            border-radius: 28px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--button-color); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        /* Чекбокс согласия */
+        .agree-box {
+            display: flex;
+            align-items: flex-start;
+            font-size: 12px;
+            color: var(--hint-color);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .agree-box input { margin-right: 10px; margin-top: 2px; transform: scale(1.2); }
+
+        /* Кнопка отправки */
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .submit-btn:disabled { opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>League of Spirits</h1>
+        <p>Анкета участника</p>
+    </div>
+
+    <!-- Форма -->
+    <div class="form-group">
+        <label>Фамилия</label>
+        <input type="text" id="surname" placeholder="Введите текст">
+    </div>
+    <div class="form-group">
+        <label>Имя</label>
+        <input type="text" id="name" placeholder="Введите текст">
+    </div>
+    <div class="form-group">
+        <label>Отчество</label>
+        <input type="text" id="patronymic" placeholder="Введите текст">
+    </div>
+    <div class="form-group">
+        <label>Никнейм</label>
+        <input type="text" id="nickname" placeholder="Введите текст">
+        <div class="hint">Пиши тот ник, под которым будешь играть в нашей лиге.</div>
+    </div>
+    <div class="form-group">
+        <label>Дата рождения</label>
+        <input type="text" id="birthdate" placeholder="дд.мм.гггг">
+    </div>
+    <div class="form-group">
+        <label>Страна проживания</label>
+        <input type="text" id="country" placeholder="Введите текст">
+    </div>
+
+    <div class="form-group">
+        <label>MMR</label>
+        <input type="text" id="mmr" placeholder="Введите текст">
+        <div class="hint">Актуальный mmr на момент регистрации</div>
+    </div>
+    
+    <div class="form-group">
+        <label>Ссылка на Dotabuff</label>
+        <input type="text" id="dotabuff" placeholder="Вставь ссылку">
+    </div>
+
+    <!-- Роли -->
+    <div class="form-group">
+        <label>Выбери позиции, на которых ты играешь</label>
+        <div class="switch-row">
+            <span>Carry</span>
+            <label class="toggle"><input type="checkbox" id="role_carry"><span class="slider"></span></label>
+        </div>
+        <div class="switch-row">
+            <span>Mid</span>
+            <label class="toggle"><input type="checkbox" id="role_mid"><span class="slider"></span></label>
+        </div>
+        <div class="switch-row">
+            <span>Offlaner</span>
+            <label class="toggle"><input type="checkbox" id="role_offlaner"><span class="slider"></span></label>
+        </div>
+        <div class="switch-row">
+            <span>Soft support</span>
+            <label class="toggle"><input type="checkbox" id="role_soft"><span class="slider"></span></label>
+        </div>
+        <div class="switch-row">
+            <span>Hard support</span>
+            <label class="toggle"><input type="checkbox" id="role_hard"><span class="slider"></span></label>
+        </div>
+    </div>
+
+    <label class="agree-box">
+        <input type="checkbox" id="agree">
+        <span>Я ОЗНАКОМЛЕН С ПРАВИЛАМИ И РЕГЛАМЕНТОМ LEAGUE OF SPIRITS И ДАЮ СОГЛАСИЕ НА ХРАНЕНИЕ, ОБРАБОТКУ, ИСПОЛЬЗОВАНИЕ ДАННЫХ.</span>
+    </label>
+
+    <button class="submit-btn" id="submit">✅ Отправить ответ</button>
+
+    <script>
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Разворачиваем на весь экран
+
+        document.getElementById('submit').addEventListener('click', () => {
+            // Проверка на заполнение обязательных полей
+            const surname = document.getElementById('surname').value;
+            const name = document.getElementById('name').value;
+            const nickname = document.getElementById('nickname').value;
+            const agree = document.getElementById('agree').checked;
+
+            if (!surname || !name || !nickname) {
+                tg.showAlert("Пожалуйста, заполните Фамилию, Имя и Никнейм!");
+                return;
+            }
+            if (!agree) {
+                tg.showAlert("Необходимо согласиться с правилами!");
+                return;
+            }
+
+            // Собираем данные из формы
+            const formData = {
+                surname: surname,
+                name: name,
+                patronymic: document.getElementById('patronymic').value,
+                nickname: nickname,
+                birth_date: document.getElementById('birthdate').value,
+                country: document.getElementById('country').value,
+                mmr: document.getElementById('mmr').value,
+                dotabuff: document.getElementById('dotabuff').value,
+                roles: []
+            };
+
+            // Проверяем, какие свитчи включены
+            if (document.getElementById('role_carry').checked) formData.roles.push('Carry');
+            if (document.getElementById('role_mid').checked) formData.roles.push('Mid');
+            if (document.getElementById('role_offlaner').checked) formData.roles.push('Offlaner');
+            if (document.getElementById('role_soft').checked) formData.roles.push('Soft support');
+            if (document.getElementById('role_hard').checked) formData.roles.push('Hard support');
+
+            // Отправляем данные в Telegram
+            tg.sendData(JSON.stringify(formData));
+            
+            // Закрываем Mini App
+            tg.close();
+        });
+    </script>
+</body>
+</html>
